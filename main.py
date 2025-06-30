@@ -1,14 +1,36 @@
 import cv2 as cv
 import numpy as np
+import tkinter as tk
+from tkinter import filedialog
 
 #C:/Users/Rostislick/Desktop/bocchi.png
 
+def start_menu():
+    window = tk.Tk()
+    window.title("Start menu")
+    window.geometry("200x200")
+
+    btn_load_image = tk.Button(text="Load image", command=load_image)
+    btn_load_image.pack()
+
+    btn_web_image = tk.Button(text="Take a image to webcamera", command=web_image)
+    btn_web_image.pack()
+
+    btn_exit = tk.Button(text="Exit", command=exit)
+    btn_exit.pack()
+    
+    window.mainloop()
+
+
 def load_image():
-    try:
-        image = cv.imdecode(np.fromfile(input("Введите путь к фото: "), dtype=np.uint8), cv.IMREAD_COLOR)
-    except:
-        print("Некоректный ввод")
-    return image
+    image = filedialog.askopenfilename()
+    if image != "":
+        image = str(image)
+        functional_menu(image)
+    else:
+        print("Не выбран файл")
+    
+    
 
 def web_image():
     cap = cv.VideoCapture(0)
@@ -23,6 +45,24 @@ def web_image():
     cap.release()
     cv.destroyAllWindows()
     return image
+
+def functional_menu(image):
+
+    btn_show_image = tk.Button(text="Show image", command=show_image)
+    btn_show_image.pack()
+
+    btn_show_rgb = tk.Button(text="Show RGB image", command=show_rgb)
+    btn_show_rgb.pack()
+
+    btn_down_bright = tk.Button(text="Down bright", command=down_bright)
+    btn_down_bright.pack()
+
+    btn_show_grey = tk.Button(text="Show grey image", command=show_grey)
+    btn_show_grey.pack()
+
+    btn_draw_rectangle = tk.Button(text="Draw rectangle", command=draw_rectangle)
+    btn_draw_rectangle.pack()
+
 
 
 def show_image(image, name_of_window = "Image"):
@@ -96,7 +136,9 @@ DOWN_BRIGHT = "5"
 SHOW_GREY = "6"
 DRAW_RECTANGLE = "7"
 
-while True:
+start_menu()
+
+"""while True:
     print ("Выберите операцию:", "\n",
            "0. Выход", "\n",
            "1. Загрузить картинку", "\n",
@@ -125,4 +167,4 @@ while True:
     elif n == DRAW_RECTANGLE:
         draw_rectangle(image)
     else:
-        print("Некоректный ввод")
+        print("Некоректный ввод")"""
