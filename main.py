@@ -11,7 +11,19 @@ def load_image():
     return image
 
 def web_image():
-    pass
+    cap = cv.VideoCapture(0)
+
+    while True:
+        ret, frame = cap.read()
+        cv.imshow("camera", frame)
+        if cv.waitKey(10) == 27: # Клавиша Esc
+            break
+    image = frame
+    cv.imwrite("image.jpg", image)
+    cap.release()
+    cv.destroyAllWindows()
+    return image
+
 
 def show_image(image, name_of_window = "Image"):
     cv.namedWindow(name_of_window, cv.WINDOW_NORMAL)
@@ -101,7 +113,7 @@ while True:
     elif n == LOAD_IMAGE:
         image = load_image()
     elif n == WEB_IMAGE:
-        web_image()
+        image = web_image()
     elif n == SHOW_IMAGE:
         show_image(image)
     elif n == SHOW_RGB:
