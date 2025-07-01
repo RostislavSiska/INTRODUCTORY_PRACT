@@ -7,12 +7,15 @@ from tkinter import filedialog
 class PhotoEditor:
 
 
-    
-
     def __init__(self):
         self.image = ""
 
     def start_menu(self):
+        """
+        Эта функция запускает стартовое меню,
+        в котором три кнопки: загрузка фото,
+        сделать фото с веб камеры, и выход
+        """
 
         start_window = Tk()
         start_window.title("Start window")
@@ -31,32 +34,48 @@ class PhotoEditor:
 
 
     def load_image(self):
+        """
+        Эта функция загружает фото из памяти компьютера
+        """
+
         self.image = filedialog.askopenfilename()
+
         if self.image != "" and (self.image[len(self.image)-3:] == "jpg" 
                                 or self.image[len(self.image)-3:] == "png"):
+            
             file = open(self.image, "rb")
             bytes = bytearray(file.read())
             numpyarray = np.asarray(bytes, dtype=np.uint8)
             self.image = cv.imdecode(numpyarray, cv.IMREAD_UNCHANGED)
             self.functional_menu()
+
         else:
             #Вывод окна с ошибкой
             print("Не выбран файл")
 
     def web_image(self):
+        """
+        Эта функция делает фото с веб камеры
+        """
 
         cap = cv.VideoCapture(0)
 
         while True:
+
             ret, frame = cap.read()
+
             if ret is False:
+
                 #Вывод окна ошибки
                 print("Камера не подключена")
                 break
+
             else:
                 cv.imshow("camera", frame)
+
             if cv.waitKey(10) == 27: # Клавиша Esc
                 break
+        
         #Можно сделать ввод имени файла
         cv.imwrite("image.png", frame)
         self.image = cv.imread("image.png")
@@ -66,6 +85,10 @@ class PhotoEditor:
 
         #Можно сделать название окна = название изображения
     def show_image(self,  name_of_window = "Image"):
+        """
+        Эта функция выводит изображение на экран
+        """
+
         cv.namedWindow(name_of_window, cv.WINDOW_NORMAL)
         cv.resizeWindow(name_of_window, 800, 500)
         cv.imshow(name_of_window, self.image)
@@ -75,6 +98,10 @@ class PhotoEditor:
     
 
     def rgb_menu(self):
+        """
+        Эта функция предстовляет собой меню с
+        выбором каналов RGB
+        """
 
         rgb_window = Tk()
         rgb_window.title("RGB")
@@ -90,9 +117,11 @@ class PhotoEditor:
         btn_green.pack()
 
 
-
-
     def show_blue(self):
+        """
+        Эта функция показывает синий канал
+        """
+
         image_copy = self.image.copy()
         # set green and red channels to 0
         self.image[:, :, 1] = 0
@@ -102,6 +131,10 @@ class PhotoEditor:
 
 
     def show_red(self):
+        """
+        Эта функция показывает красный канал
+        """
+
         image_copy = self.image.copy()
         # set green and red channels to 0
         self.image[:, :, 0] = 0
@@ -110,6 +143,10 @@ class PhotoEditor:
         self.image = image_copy
 
     def show_green(self):
+        """
+        Эта функция показывает зеленыый канал
+        """
+
         image_copy = self.image.copy()
         # set green and red channels to 0
         self.image[:, :, 0] = 0
@@ -118,13 +155,21 @@ class PhotoEditor:
         self.image = image_copy
 
     def down_bright(self):
+        """
+        Эта функция понижает яркость фотографии
+        """
+        # Минус на минус, поставить кап
 
         def close():
+
+            image_copy = self.image.copy()
+
             try:
                 beta_n = entry.get()
-                beta = int(beta_n) * (-1)
-                self.image = cv.convertScaleAbs(self.image, alpha=1, beta=beta)
+                beta = int(beta_n)
+                self.image = cv.convertScaleAbs(self.image, alpha=1, beta=(beta*(-1)))
                 self.show_image()
+                self.image = image_copy
                 downbrig_window.destroy()
                 return beta
             except:
@@ -140,22 +185,31 @@ class PhotoEditor:
 
         entry = Entry(downbrig_window, width=30)
         entry.pack(pady=5, padx=10)
-        image_copy = self.image.copy()
-        
+                
         btn_close = Button(downbrig_window, text="Принять", command=close)
         btn_close.pack(pady=15, padx=10)
-
-        self.image = image_copy
 
         downbrig_window.mainloop()
         
     def show_grey(self):
+        """
+        Эта функция выводит изображение в 
+        оттенках серого
+        """
+
         image_copy = self.image.copy()
         self.image = cv.cvtColor(self.image, cv.COLOR_BGR2GRAY)
         self.show_image()
         self.image = image_copy
 
     def draw_rectangle(self):
+        """
+        Эта функция рисут прямоугольник по 
+        координатам, которые ввел пользователь
+        """
+        #Лимит ввиде размер окна
+
+        image_copy = self.image.copy()
 
         def close():
             try:
@@ -169,6 +223,7 @@ class PhotoEditor:
                 y2 = int(y2_n)
                 cv.rectangle(self.image, (x1, y1), (x2, y2), color=(255, 0, 0), thickness=-1)
                 self.show_image()
+                self.image = image_copy
                 draw_window.destroy()
             except:
                 # Окно с ошибкой
@@ -193,17 +248,22 @@ class PhotoEditor:
         entry_y2 = Entry(draw_window, width=5)
         entry_y2.pack()
 
-        image_copy = self.image.copy()
-
-
         btn_close = Button(draw_window, text="Принять", command=close)
         btn_close.pack(pady=15, padx=10)
 
-        self.image = image_copy
-
         draw_window.mainloop()
 
+
     def functional_menu(self):
+        """
+        Эта функция предстовляет собой, меню с 
+        выбором операций, которые можно провести
+        над изображением
+        """
+
+        def back_start_menu():
+            functional_window.destroy()
+
         
         functional_window = Tk()
         functional_window.title("Functional window")
@@ -224,10 +284,10 @@ class PhotoEditor:
     
         btn_draw_rectangle = Button(functional_window, text="Нарисовать прямоугольник на фото", command=self.draw_rectangle)
         btn_draw_rectangle.pack()
-    """
-        btn_back = Button(functional_window, text="Back", command=self.back_start_menu)
+    
+        btn_back = Button(functional_window, text="Назад", command=back_start_menu)
         btn_back.pack()
-    """
+    
 
         
 
