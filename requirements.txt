@@ -1,0 +1,5 @@
+certifi @ file:///C:/b/abs_85o_6fm0se/croot/certifi_1671487778835/work/certifi
+numpy==1.21.6
+opencv-python==4.11.0.86
+tk==0.1.0
+wincertstore==0.2
