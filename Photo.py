@@ -6,9 +6,28 @@ from tkinter import filedialog
 
 class PhotoEditor:
 
-
     def __init__(self):
         self.image = ""
+
+
+    def error(self,n):
+        """
+        Эта функция выводит окно с ошибкой
+        """
+
+        def ok():
+            error_window.destroy()
+
+        error_window = Tk()
+        error_window.title("Error")
+        error_window.geometry("200x80")
+        Label(error_window, text=f'{n}').pack(pady=5)
+
+        btn_ok = Button(error_window, text="OK", command=ok)
+        btn_ok.pack()
+
+        error_window.mainloop()
+
 
     def start_menu(self):
         """
@@ -50,8 +69,9 @@ class PhotoEditor:
             self.functional_menu()
 
         else:
-            #Вывод окна с ошибкой
-            print("Не выбран файл")
+            n = "Фото не загрузилось"
+            self.error(n)
+
 
     def web_image(self):
         """
@@ -60,14 +80,17 @@ class PhotoEditor:
 
         cap = cv.VideoCapture(0)
 
+        i = 1
+
         while True:
 
             ret, frame = cap.read()
 
             if ret is False:
 
-                #Вывод окна ошибки
-                print("Камера не подключена")
+                n = "Камера не подключена"
+                i = 0
+                self.error(n)
                 break
 
             else:
@@ -76,14 +99,14 @@ class PhotoEditor:
             if cv.waitKey(10) == 27: # Клавиша Esc
                 break
         
-        #Можно сделать ввод имени файла
-        cv.imwrite("image.png", frame)
-        self.image = cv.imread("image.png")
-        cap.release()
-        cv.destroyAllWindows()
-        self.functional_menu()
+        if i == 1:
+            cv.imwrite("image.png", frame)
+            self.image = cv.imread("image.png")
+            cap.release()
+            cv.destroyAllWindows()
+            self.functional_menu()
+        
 
-        #Можно сделать название окна = название изображения
     def show_image(self,  name_of_window = "Image"):
         """
         Эта функция выводит изображение на экран
@@ -96,7 +119,6 @@ class PhotoEditor:
         cv.destroyAllWindows()
 
     
-
     def rgb_menu(self):
         """
         Эта функция предстовляет собой меню с
@@ -123,7 +145,6 @@ class PhotoEditor:
         """
 
         image_copy = self.image.copy()
-        # set green and red channels to 0
         self.image[:, :, 1] = 0
         self.image[:, :, 2] = 0
         self.show_image()
@@ -136,11 +157,11 @@ class PhotoEditor:
         """
 
         image_copy = self.image.copy()
-        # set green and red channels to 0
         self.image[:, :, 0] = 0
         self.image[:, :, 1] = 0
         self.show_image()
         self.image = image_copy
+
 
     def show_green(self):
         """
@@ -148,17 +169,16 @@ class PhotoEditor:
         """
 
         image_copy = self.image.copy()
-        # set green and red channels to 0
         self.image[:, :, 0] = 0
         self.image[:, :, 2] = 0
         self.show_image()
         self.image = image_copy
 
+
     def down_bright(self):
         """
         Эта функция понижает яркость фотографии
         """
-        # Минус на минус, поставить кап
 
         def close():
 
@@ -167,15 +187,16 @@ class PhotoEditor:
             try:
                 beta_n = entry.get()
                 beta = int(beta_n)
-                self.image = cv.convertScaleAbs(self.image, alpha=1, beta=(beta*(-1)))
-                self.show_image()
-                self.image = image_copy
-                downbrig_window.destroy()
-                return beta
+                if beta < 0:
+                    raise
+                else:
+                    self.image = cv.convertScaleAbs(self.image, alpha=1, beta=(beta*(-1)))
+                    self.show_image()
+                    self.image = image_copy
+                    downbrig_window.destroy()
             except:
-                # Окно с ошибкой
-                print("Некоректный ввод")
-                return 0
+                n = "Некоректный ввод"
+                self.error(n)
 
         downbrig_window = Tk()
         downbrig_window.title("Down bright")
@@ -190,7 +211,8 @@ class PhotoEditor:
         btn_close.pack(pady=15, padx=10)
 
         downbrig_window.mainloop()
-        
+
+
     def show_grey(self):
         """
         Эта функция выводит изображение в 
@@ -202,12 +224,12 @@ class PhotoEditor:
         self.show_image()
         self.image = image_copy
 
+
     def draw_rectangle(self):
         """
         Эта функция рисут прямоугольник по 
         координатам, которые ввел пользователь
         """
-        #Лимит ввиде размер окна
 
         image_copy = self.image.copy()
 
@@ -226,12 +248,13 @@ class PhotoEditor:
                 self.image = image_copy
                 draw_window.destroy()
             except:
-                # Окно с ошибкой
-                print ("Некоректный ввод")
+                n = "Некоректный ввод"
+                self.error(n)
+
         
         draw_window = Tk()
         draw_window.title("Draw rectangle")
-        draw_window.geometry("300x300")
+        draw_window.geometry("400x400")
 
         Label(draw_window, text="Верхний-левый угол прямоугольника: ").pack()
         Label(draw_window, text="X1").pack()
